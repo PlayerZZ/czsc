@@ -9,7 +9,7 @@ describe: 数据工具
 from .ts_cache import TsDataCache
 from . import ts
 from .base import *
-
+from .binance_data import BinanceData
 
 def get_symbols(dc: TsDataCache, step):
     """获取择时策略投研不同阶段对应的标的列表
