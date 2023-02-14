@@ -7,6 +7,8 @@ describe: CZSC 逐K线播放
 https://pyecharts.org/#/zh-cn/web_flask
 """
 import sys
+from datetime import datetime
+
 sys.path.insert(0, '.')
 sys.path.insert(0, '..')
 from flask import Flask, render_template
@@ -18,13 +20,17 @@ data = BinanceData("BNBUSDT")
 app = Flask(__name__, static_folder="templates")
 bars = data.get_klines(Freq.F1)
 idx = 1000
-
+last_dt = int(bars[-1].dt.timestamp())
 
 def bar_base():
     global idx
-    idx += 1
-    _bars = bars[:idx]
-    print(idx, _bars[-1].dt)
+    global last_dt
+    timenow = int(bars[-1].dt.timestamp())
+    if last_dt != timenow:
+        last_dt = timenow
+        idx += 1
+    _bars = bars[-idx:-1]
+    # print(idx, _bars[-1].dt)
 
     c = CZSC(_bars).to_echarts()
     return c
