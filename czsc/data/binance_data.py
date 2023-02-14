@@ -7,10 +7,7 @@ from binance.client import Client
 from czsc.objects import RawBar, Freq
 
 
-
-
 def main():
-
     # symbol = 'BNBUSDT'
     # client = Client()
     # #kline里面的值依次为：
@@ -39,12 +36,8 @@ def main():
         print(klines[-1])
 
 
-
-
-
-
 class BinanceData:
-    def __init__(self,symbol):
+    def __init__(self, symbol):
         self.symbol = symbol
         self.client = Client()
         self.twm = ThreadedWebsocketManager()
@@ -58,46 +51,45 @@ class BinanceData:
         # self.twm.start_kline_socket(callback=self.handle_socket_message_5m, symbol=self.symbol)
         self.klines_5m_RawBar = self.format_kline(klines_5m, Freq.F5)
 
+    def handle_socket_message_1m(self, msg):
+        # 组装成RawBar
+        print(msg['k']['v'])
+        bar = RawBar(symbol=self.symbol, dt=pd.to_datetime(msg['k']['t'], unit='ms'),
+                     id=msg['k']['i'], freq=Freq.F1, open=float(msg['k']['o']),
+                     close=float(msg['k']['c']), high=float(msg['k']['h']),
+                     low=float(msg['k']['l']), vol=float(msg['k']['v']),)
 
-    def handle_socket_message_1m(self,msg):
-        #组装成RawBar
-        bar = RawBar(symbol=self.symbol, dt=pd.to_datetime(msg['k']['t'],unit='ms'),
-                     id=msg['k']['i'], freq=Freq.F1, open=msg['k']['o'], close=msg['k']['c'],
-                     high=msg['k']['h'], low=msg['k']['l'],
-                     vol=msg['k']['v'],  # 成交量，单位：股
-                     amount=msg['k']['q'],  # 成交额，单位：元
-                     )
-        #获取最后一个k线
+        # 获取最后一个k线
         last_bar = self.klines_1m_RawBar[-1]
-        #如果最后一个k线的时间小于当前k线的时间，说明是新的一根k线
+        # 如果最后一个k线的时间小于当前k线的时间，说明是新的一根k线
         if last_bar.dt < bar.dt:
             self.klines_1m_RawBar.append(bar)
-        #如果最后一个k线的时间等于当前k线的时间，说明是最后一根k线的更新
+        # 如果最后一个k线的时间等于当前k线的时间，说明是最后一根k线的更新
         elif last_bar.dt == bar.dt:
             self.klines_1m_RawBar[-1] = bar
         else:
             print("error happened")
 
-
     def format_kline(self, _klines, F1):
         bars = []
         for i, record in enumerate(_klines):
             bar = RawBar(symbol=self.symbol, dt=pd.to_datetime(record[0], unit='ms'),
-                         id=i, freq=F1, open=record[1], close=record[4],
-                         high=record[2], low=record[3],
-                         vol=record[5],  # 成交量，单位：股
-                         amount=record[7],  # 成交额，单位：元
+                         id=i, freq=F1, open=float(record[1]), close=float(record[4]),
+                         high=float(record[2]), low=float(record[3]),
+                         vol=float(record[5]),  # 成交量，单位：股
+                         amount=float(record[7]),  # 成交额，单位：元
                          )
             bars.append(bar)
         return bars
-    def get_klines(self,freq):
+
+    def get_klines(self, freq):
         if freq == Freq.F1:
             return self.klines_1m_RawBar
         elif freq == Freq.F5:
             return self.klines_5m_RawBar
         else:
             print("error happened")
-   
+
 
 if __name__ == "__main__":
-   main()
+    main()
