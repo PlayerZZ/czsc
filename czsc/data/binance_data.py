@@ -8,26 +8,6 @@ from czsc.objects import RawBar, Freq
 
 
 def main():
-    # symbol = 'BNBUSDT'
-    # client = Client()
-    # #kline里面的值依次为：
-    # # Open time, Open, High, Low, Close, Volume, Close time, Quote asset volume, Number of trades, Taker buy base asset volume, Taker buy quote asset volume, Ignore
-    # klines = client.get_historical_klines(symbol, Client.KLINE_INTERVAL_1MINUTE, "1 day ago UTC")
-    # print(klines)
-    # twm = ThreadedWebsocketManager()
-    # # start is required to initialise its internal loop
-    # twm.start()
-    #
-    # def handle_socket_message(msg):
-    #     print("进来了")
-    #     print(msg)
-    #
-    # twm.start_kline_socket(callback=handle_socket_message, symbol=symbol)
-    #
-    # # twm.join()
-    # while True:
-    #     time.sleep(1)
-    #     print("1s")
     data = BinanceData('BNBUSDT')
     while True:
         time.sleep(10)
